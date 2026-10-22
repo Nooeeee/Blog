@@ -1,6 +1,5 @@
-<footer>
-    Je suis le blob super cool !!!!
-</footer>
-
-</body>
+        <footer>
+            Je suis le blob super cool !!!!
+        </footer>
+    </body>
 </htlm>
