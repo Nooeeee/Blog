@@ -13,22 +13,22 @@
         return $connexion;
     }
 
-    function getAllEmail($connexion) {
-        $stmt = $connexion->query("SELECT email FROM utilisateur");
-        $rows = $stmt->fetchAll();
-        return $rows;
+    function getUserByEmail(?string $email){
+        $stmt = getConnexion()->prepare("SELECT * FROM user WHERE email=?");
+        $stmt->execute([$email]);
+
+        return $stmt->fetch();
     }
 
-    function saveUser($connexion) {
-        $sql = "INSERT INTO utilisateur (email, mdp) VALUES(?, ?)";
-        $st = $connexion->prepare($sql);
+    function getAllEmail($connexion) {
+        $stmt = $connexion->query("SELECT email FROM user");
+        return $stmt->fetchAll();
+    }
 
-        $mdpChiffre = password_hash($_SESSION['mdp'], PASSWORD_DEFAULT);
-
-        $st->bindParam(1, $_SESSION['email']);
-        $st->bindParam(2, $mdpChiffre);
-
-        $st->execute();
+    function createUser(string $email, string $pwd, string $pseudo, bool $admin = false): int {
+        $st = getConnexion()->prepare("INSERT INTO User (email, mdp, pseudo, admin) VALUES(?, ?, ?, ?)");
+        $st->execute( [$email, $pwd, $pseudo, (int) $admin] );
+        return (int) getConnexion()->lastInsertId();
     }
 
 ?>
