@@ -9,7 +9,7 @@
 
     getConnexion();
     if( isConnected() ){
-        header("Location: index.php");
+        header("Location: /TPBlog/index.php");
         exit;
     }
 
@@ -30,10 +30,13 @@
                     $user = getUserByEmail($_SESSION['email']);
                     if ( $user ) {
                         if ( password_verify($_POST['pwd'], $user['mdp']) ) {
-                            $_SESSION['userId'] = (int) $user['id'];
+                            $_SESSION['idUser'] = (int) $user['idUser'];
                             $_SESSION['isAdmin'] = (bool) $user['admin'];
+                            $_SESSION['pseudo'] = $user['pseudo'];
 
-                            header("Location: index.php");
+                            unset($_SESSION['email']);
+
+                            header("Location: /TPBlog/index.php");
                             exit(0);
                         } else {
                             $ErrorMsgPwd = 'Mot de passe incorrecte.';
@@ -58,11 +61,12 @@
     }
 
     if( isset($_SESSION['email']) && isset($_SESSION['pwd']) ) {
-        $_SESSION['userId'] = createUser($_SESSION['email'], $_SESSION['pwd'], $_SESSION['pseudo'], $_SESSION['isAdmin']);
+        $_SESSION['idUser'] = createUser($_SESSION['email'], $_SESSION['pwd'], $_SESSION['pseudo'], $_SESSION['isAdmin']);
 
         unset($_SESSION['email']);
         unset($_SESSION['pwd']);
-        header("Location: index.php");
+        header("Location: /TPBlog/index.php");
+        exit;
     }
 
     require_once __DIR__ . '/includes/header.php';

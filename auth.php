@@ -3,12 +3,12 @@
 
     if ( isset($_POST['logout']) ) {
         logoutUser();
-        header("Location: connexion.php");
+        header("Location: /TPBlog/connexion.php");
         exit;
     }
 
     function isConnected(): bool {
-        return isset($_SESSION['userId']);
+        return isset($_SESSION['idUser']);
     }
 
     function isAdmin(): bool {
@@ -17,14 +17,14 @@
 
     function requireLogin(): void {
         if( !isConnected() ){
-            header("Location: connexion.php");
+            header("Location: /TPBlog/connexion.php");
             exit;
         }
     }
 
     function requireAdmin(): void {
         if( !isAdmin() ) {
-            header("Location: index.php");
+            header("Location: /TPBlog/index.php");
             exit;
         }
     }
