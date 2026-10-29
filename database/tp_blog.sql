@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le : jeu. 29 oct. 2026 à 12:41
+-- Généré le : jeu. 29 oct. 2026 à 13:52
 -- Version du serveur : 8.4.7
 -- Version de PHP : 8.3.28
 
@@ -61,9 +61,21 @@ CREATE TABLE IF NOT EXISTS `article_categorie` (
 DROP TABLE IF EXISTS `categorie`;
 CREATE TABLE IF NOT EXISTS `categorie` (
   `idCategorie` int NOT NULL AUTO_INCREMENT,
-  `nom` varchar(25) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Nom de la catégorie',
+  `nom` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Nom de la catégorie',
   PRIMARY KEY (`idCategorie`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Déchargement des données de la table `categorie`
+--
+
+INSERT INTO `categorie` (`idCategorie`, `nom`) VALUES
+(1, 'Développement Web'),
+(2, 'Programmation Java'),
+(3, 'Base de données'),
+(4, 'Cybersécurité'),
+(5, 'Intelligence Artificielle'),
+(6, 'Systèmes & Réseaux');
 
 -- --------------------------------------------------------
 

@@ -1,5 +1,5 @@
 <?php
-    require_once("init.php");
+    require_once  __DIR__ . '/config/init.php';
 
     $ErrorMsgMail = null;
     $ErrorMsgPwd = null;
@@ -65,7 +65,7 @@
         header("Location: index.php");
     }
 
-    require_once("header.php");
+    require_once __DIR__ . '/includes/header.php';
 ?>
     <div>
         <h1>Inscription</h1>
@@ -91,5 +91,5 @@
     <br/>
 
 <?php
-    require_once("footer.php");
+    require_once __DIR__ . '/includes/footer.php';
 ?>

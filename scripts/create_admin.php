@@ -3,7 +3,8 @@
  * Aller sur la page suivante : http://localhost/TP_Blog/create_admin.php
  * 'TP_Blog' est à remplacer par le dossier où le projet est enregistré
  */
-    require_once("init.php");
+
+    require_once __DIR__ . '/../config/init.php';
 
     $connexion = getConnexion();
     $stmt = $connexion->query("SELECT * FROM user WHERE email='admin@localhost.fr'");
