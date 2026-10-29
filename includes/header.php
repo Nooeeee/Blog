@@ -1,11 +1,11 @@
 <?php
-    require_once("init.php");
+    require_once("../config/init.php");
 ?>
 <html lang="fr">
     <body>
         <header>
             <ul>
-                <li><a href="connexion.php">Inscription/Connexion</a></li>
+                <li><a href="../connexion.php">Inscription/Connexion</a></li>
             </ul>
             <?php if ( isConnected() ) { ?>
                 <form method="POST">
