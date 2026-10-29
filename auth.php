@@ -24,7 +24,7 @@
 
     function requireAdmin(): void {
         if( !isAdmin() ) {
-            header("Location: blog.php");
+            header("Location: index.php");
             exit;
         }
     }

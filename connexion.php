@@ -9,7 +9,7 @@
 
     getConnexion();
     if( isConnected() ){
-        header("Location: blog.php");
+        header("Location: index.php");
         exit;
     }
 
@@ -33,7 +33,7 @@
                             $_SESSION['userId'] = (int) $user['id'];
                             $_SESSION['isAdmin'] = (bool) $user['admin'];
 
-                            header("Location: blog.php");
+                            header("Location: index.php");
                             exit(0);
                         } else {
                             $ErrorMsgPwd = 'Mot de passe incorrecte.';
@@ -62,7 +62,7 @@
 
         unset($_SESSION['email']);
         unset($_SESSION['pwd']);
-        header("Location: blog.php");
+        header("Location: index.php");
     }
 
     require_once("header.php");
