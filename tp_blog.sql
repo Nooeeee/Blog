@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le : lun. 26 oct. 2026 à 19:22
+-- Généré le : jeu. 29 oct. 2026 à 12:41
 -- Version du serveur : 8.4.7
 -- Version de PHP : 8.3.28
 
@@ -29,12 +29,12 @@ SET time_zone = "+00:00";
 
 DROP TABLE IF EXISTS `article`;
 CREATE TABLE IF NOT EXISTS `article` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `titre` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `date` date NOT NULL,
-  `user_id` int NOT NULL,
-  PRIMARY KEY (`id`),
+  `idArticle` int NOT NULL AUTO_INCREMENT,
+  `titre` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'titre de l''article',
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Contenu de l''article',
+  `date` date NOT NULL COMMENT 'date de publication de l''article',
+  `user_id` int NOT NULL COMMENT 'Identifiant de l''utilisateur ayant créé et publié le l''article.',
+  PRIMARY KEY (`idArticle`),
   KEY `user_article` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -46,10 +46,10 @@ CREATE TABLE IF NOT EXISTS `article` (
 
 DROP TABLE IF EXISTS `article_categorie`;
 CREATE TABLE IF NOT EXISTS `article_categorie` (
-  `article_id` int NOT NULL,
-  `categorie_id` int NOT NULL,
-  KEY `FKArticle` (`article_id`),
-  KEY `FKCategorie` (`categorie_id`)
+  `idArticle` int NOT NULL COMMENT 'Clé étrangère de jointure vers l''identifiant de l''article',
+  `idCategorie` int NOT NULL COMMENT 'Clé étrangère de jointure vers l''identifiant de la catégorie',
+  PRIMARY KEY (`idArticle`,`idCategorie`),
+  KEY `FKCategorie` (`idCategorie`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -60,9 +60,9 @@ CREATE TABLE IF NOT EXISTS `article_categorie` (
 
 DROP TABLE IF EXISTS `categorie`;
 CREATE TABLE IF NOT EXISTS `categorie` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `nom` varchar(25) COLLATE utf8mb4_unicode_ci NOT NULL,
-  PRIMARY KEY (`id`)
+  `idCategorie` int NOT NULL AUTO_INCREMENT,
+  `nom` varchar(25) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Nom de la catégorie',
+  PRIMARY KEY (`idCategorie`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -73,12 +73,12 @@ CREATE TABLE IF NOT EXISTS `categorie` (
 
 DROP TABLE IF EXISTS `commentaire`;
 CREATE TABLE IF NOT EXISTS `commentaire` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `description` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `date` date NOT NULL,
-  `article_id` int NOT NULL,
-  `user_id` int NOT NULL,
-  PRIMARY KEY (`id`),
+  `idCommentaire` int NOT NULL AUTO_INCREMENT,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Contenu du commentaire',
+  `date` date NOT NULL COMMENT 'Date de publication du commentaire',
+  `article_id` int NOT NULL COMMENT 'Identifiant de l''article commenté',
+  `user_id` int NOT NULL COMMENT 'Identifiant de l''utilisateur ayant publié le commentaire',
+  PRIMARY KEY (`idCommentaire`),
   KEY `article_id` (`article_id`),
   KEY `user_com` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -91,20 +91,20 @@ CREATE TABLE IF NOT EXISTS `commentaire` (
 
 DROP TABLE IF EXISTS `user`;
 CREATE TABLE IF NOT EXISTS `user` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `mdp` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `pseudo` varchar(25) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `admin` tinyint(1) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `idUser` int NOT NULL AUTO_INCREMENT,
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Adresse mail de l''utilisateur',
+  `mdp` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Mot de passe haché de l''utilisateur',
+  `pseudo` varchar(25) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Début de l''email de l''utilisateur',
+  `admin` tinyint(1) NOT NULL COMMENT 'Booléen pour connaître les permissions à accorder à l''utilisateur (1 = administrateur)',
+  PRIMARY KEY (`idUser`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `user`
 --
 
-INSERT INTO `user` (`id`, `email`, `mdp`, `pseudo`, `admin`) VALUES
-(1, 'admin@localhost.fr', '$2y$10$TC10813P.Y9JMaSrNXlMv.J9wDCtL9MuMkCEFwVaCgny8uruQ0312', 'admin', 1);
+INSERT INTO `user` (`idUser`, `email`, `mdp`, `pseudo`, `admin`) VALUES
+(6, 'admin@localhost.fr', 'admin69IUT;', 'admin', 1);
 
 --
 -- Contraintes pour les tables déchargées
@@ -114,21 +114,21 @@ INSERT INTO `user` (`id`, `email`, `mdp`, `pseudo`, `admin`) VALUES
 -- Contraintes pour la table `article`
 --
 ALTER TABLE `article`
-  ADD CONSTRAINT `user_article` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `user_article` FOREIGN KEY (`user_id`) REFERENCES `user` (`idUser`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Contraintes pour la table `article_categorie`
 --
 ALTER TABLE `article_categorie`
-  ADD CONSTRAINT `FKArticle` FOREIGN KEY (`article_id`) REFERENCES `article` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `FKCategorie` FOREIGN KEY (`categorie_id`) REFERENCES `categorie` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `FKArticle` FOREIGN KEY (`idArticle`) REFERENCES `article` (`idArticle`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `FKCategorie` FOREIGN KEY (`idCategorie`) REFERENCES `categorie` (`idCategorie`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Contraintes pour la table `commentaire`
 --
 ALTER TABLE `commentaire`
-  ADD CONSTRAINT `article_com` FOREIGN KEY (`article_id`) REFERENCES `article` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `user_com` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `article_com` FOREIGN KEY (`article_id`) REFERENCES `article` (`idArticle`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `user_com` FOREIGN KEY (`user_id`) REFERENCES `user` (`idUser`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
