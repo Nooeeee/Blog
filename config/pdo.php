@@ -58,7 +58,7 @@
             $connexion->commit();
 
             header("Location: /TPBlog/index.php");
-            exit;
+            return true;
         } catch( PDOException $exception ) {
             echo "Erreur SQL : " . $exception->getMessage() . "<br/>";
             if( $connexion->inTransaction() ){
@@ -66,6 +66,5 @@
             }
             return false;
         }
-        return true;
     }
 ?>
