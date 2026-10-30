@@ -13,16 +13,25 @@
         return $connexion;
     }
 
-    function getUserByEmail(?string $email){
+    function getUserByEmail(string $email){
         $stmt = getConnexion()->prepare("SELECT * FROM user WHERE email=?");
         $stmt->execute([$email]);
 
         return $stmt->fetch();
     }
 
-    function getAllEmail($connexion) {
-        $stmt = $connexion->query("SELECT email FROM user");
-        return $stmt->fetchAll();
+    function getPseudoById(int $idUser) : string {
+        $stmt = getConnexion()->prepare("SELECT pseudo FROM user WHERE idUser=?");
+        $stmt->execute([$idUser]);
+
+        return $stmt->fetch();
+    }
+
+    function getIdByPseudo(string $pseudo) : int {
+        $stmt = getConnexion()->prepare("SELECT idUser FROM user WHERE pseudo=?");
+        $stmt->execute([$pseudo]);
+
+        return $stmt->fetch();
     }
 
     function createUser(string $email, string $pwd, string $pseudo, bool $admin = false): int {
@@ -31,4 +40,31 @@
         return (int) getConnexion()->lastInsertId();
     }
 
+    function createArticle(string $title, string $description, string $date, int $idUser, array $selectedCategories) : bool {
+        $connexion = getConnexion();
+        try {
+            $connexion->beginTransaction();
+
+            $stmtArticle = $connexion->prepare("INSERT INTO Article (titre, description, date, idUser) VALUES (?, ?, ?, ?)");
+            $stmtArticle->execute([$title, $description, $date, $idUser]);
+
+            $idArticle = (int) $connexion->lastInsertId();
+
+            $stmtFk = $connexion->prepare("INSERT INTO article_categorie (idArticle, idCategorie) VALUES (?, ?)");
+            foreach ($selectedCategories as $idCategorie) {
+                $stmtFk->execute([$idArticle, (int) $idCategorie]);
+            }
+
+            $connexion->commit();
+
+            header("Location: /TPBlog/index.php");
+            return true;
+        } catch( PDOException $exception ) {
+            echo "Erreur SQL : " . $exception->getMessage() . "<br/>";
+            if( $connexion->inTransaction() ){
+                $connexion->rollBack();
+            }
+            return false;
+        }
+    }
 ?>

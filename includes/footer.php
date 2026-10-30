@@ -1,4 +1,5 @@
         <footer>
+            <br/>
             Je suis le blob super cool !!!!
             <br/>
             <?php
