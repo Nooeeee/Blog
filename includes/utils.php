@@ -9,7 +9,7 @@
         }
         echo "<span style='color:$color'>"
             . ($style === FontStyle::ITALIC ? '<i>' : '')
-            . $msg. ($style === FontStyle::ITALIC ? '</i>' : '')
+            . $msg . ($style === FontStyle::ITALIC ? '</i>' : '')
             . "</span>";
     }
 
