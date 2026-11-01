@@ -6,6 +6,7 @@
     error_reporting(error_level: E_ALL);
 
     date_default_timezone_set('Europe/Paris');
+    const DATE_FORMAT_DISPLAY = 'd-m-Y H:i';
 
     require_once __DIR__ . '/../auth.php';
     require_once __DIR__ . '/pdo.php';
