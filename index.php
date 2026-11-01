@@ -1,6 +1,6 @@
 <?php
     require_once __DIR__ . '/config/init.php';
-
+    const MAX_ARTICLE_PREVIEW_CHARACTERS = 705;
     requireLogin();
 ?>
 
@@ -31,8 +31,8 @@
                     $userPseudo = getPseudoById($article['idUser']);
                     $dateArticle = date( DATE_FORMAT_DISPLAY, strtotime($article['date']) );
                     $totalComments = getTotalComments($article['idArticle']);
-                    $articleBody = strlen($article['description']) > 150 ?
-                        mb_substr($article['description'], 0, 150) : $article['description'];
+                    $articleBody = mb_strlen($article['description']) > MAX_ARTICLE_PREVIEW_CHARACTERS ?
+                        mb_substr($article['description'], 0, MAX_ARTICLE_PREVIEW_CHARACTERS) . '...' : $article['description'];
 
                     ?>
                     <article>
@@ -42,7 +42,7 @@
                                 <p>Publié par <?= mb_strtoupper(htmlspecialchars($userPseudo))?>, le <?=$dateArticle?></p>
                         <?php endif;
                             if ( !empty($articleBody) ):?>
-                                <p><?= nl2br(htmlspecialchars($article['description'])) // garder les sauts à la ligne 'nl2br' ?></p>
+                                <p><?= nl2br(htmlspecialchars($articleBody)) // garder les sauts à la ligne 'nl2br' ?></p>
                             <?php else:
                                 showMsgErreur($errorMsgNoAvailable);
                             endif; ?>
