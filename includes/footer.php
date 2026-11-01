@@ -2,6 +2,7 @@
             <br/>
             Je suis le blob super cool !!!!
             <br/>
+            
             <?php
                 print_r("GET");
                 var_dump($_GET);

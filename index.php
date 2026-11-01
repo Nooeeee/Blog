@@ -53,9 +53,30 @@
                             <?php endif; ?>
                         </footer>
                     </article>
-                    <?php endforeach;
-                endif; ?>
+                <?php endforeach;
+        endif; ?>
                 </section>
+
+        <nav class="pages">
+            <?php if ( $currentPage > 1 ): ?>
+                <a href="/TPBlog/index.php?page=<?= $currentPage - 1 ?>">Page Précédente</a>
+            <?php endif; ?>
+
+            <?php
+            $startingPage = max(1, $currentPage - 2);
+            $endingPage = min($nbTotalPages, $currentPage + 2);
+            for ($i = $startingPage; $i <= $endingPage; $i++):
+                if ( $i === $currentPage ):?>
+                <a href="/TPBlog/index.php?page=<?= $i ?>"><strong><?= $i ?></strong></a>
+                <?php else: ?>
+                    <a href="/TPBlog/index.php?page=<?= $i ?>"><?= $i ?></a>
+            <?php endif;
+            endfor; ?>
+
+            <?php if ( $currentPage < $nbTotalPages ): ?>
+                <a href="/TPBlog/index.php?page=<?= $currentPage + 1 ?>">Page Suivant</a>
+            <?php endif; ?>
+        </nav>
     </main>
 
 
