@@ -1,29 +1,108 @@
 <?php
     require_once __DIR__ . '/config/init.php';
+    requireLogin();
 
-    $article_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+    $idArticle = (int) $_GET['idArticle'] ?? null;
+    $description = '';
+    $comments = [];
 
-    $message = '';
+    $errorMsgReleaseComment = null;
+    $errorMsgDataNotFound = null;
+    $errorMsgEmptyComment = null;
 
- if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_commentaire'])) {
+    $confirmationMsgReleaseComment = null;
+
+    // Création de commentaire
+ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_comment'])) {
      $description = trim($_POST['description'] ?? '');
-     $user_id = $_SESSION['user_id'] ?? 0;
+     $idUser = $_SESSION['idUser'] ?? getIdByPseudo($_SESSION['pseudo']);
 
-     if (!empty($description) && $user_id > 0) {
-         $stmt = $pdo->prepare('INSERT INTO commentaire (article_id, user_id, description, date) VALUES (?, ?, ?, NOW())');
-         $stmt->execute([$article_id, $user_id, $description]);
-         $message = "Votre commentaire a été publié avec succès !";
+     if ( !empty($idUser) && !empty($idArticle) && !empty($description) ) {
+         $date = date('Y-m-d H:i:s');
+
+         // insertion dans la bdd
+         if( createComment($description, $date, $idArticle, $idUser) ) {
+             $confirmationMsgReleaseComment = "Votre commentaire a été publié avec succès !";
+             $description = '';
+         } else {
+             $errorMsgReleaseComment =  "Erreur lors de la publication du commentaire.";
+         }
+     } elseif ( empty($description) ) {
+         $errorMsgEmptyComment = "Veuillez entrer un message pour publier votre commentaire.";
      } else {
-         $message = "Veuillez écrire un commentaire et être connecté.";
+         $errorMsgDataNotFound = "Erreur lors de la récupération des données.";
      }
  }
 
-$stmt = $pdo-> prepare('SELECT * FROM article WHERE idArticle ? ');
-$stmt->execute([$article_id]);
-$article =$stmt->fetch();
-
-$stmtCom = $pdo->prepare('SELECT c.*, u.pseudo FROM commentaire c JOIN user u ON c.user_id = u.id WHERE c.article_id = ? ORDER BY c.date DESC');
-$stmtCom->execute([$article_id]);
-$commentaires = $stmtCom->fetchAll();
+    // Récupération des données
+    $article = getArticle($idArticle);
+    if ( !empty($article) ) {
+        $comments = getCommentsFromArticle($idArticle);
+    }
 ?>
-faut enlever cela...
+
+<?php require_once __DIR__ . '/includes/header.php'; ?>
+    <main>
+        <?php if ( empty($article) ):
+            showMsgErreur($errorMsgDataNotFound);
+        else:
+            $userPseudo = getPseudoById($article['idUser']);
+            $dateArticle = date( DATE_FORMAT_DISPLAY, strtotime($article['date']) );
+        ?>
+        <article>
+            <h2><?= htmlspecialchars($article['titre']) ?></h2>
+            <p>Publié par <?=mb_strtoupper(htmlspecialchars($userPseudo))?>, le <?=$dateArticle?></p>
+
+            <div class="article-body">
+                <p><?= nl2br(htmlspecialchars($article['description'])) ?></p>
+            </div>
+        </article>
+
+        <hr>
+        <section class="comments-section">
+            <h3>Commentaires</h3>
+            <?php
+                showMsgErreur($errorMsgReleaseComment);
+                showMsgErreur($errorMsgDataNotFound);
+                showMsgErreur($errorMsgEmptyComment);
+                if ( !empty($confirmationMsgReleaseComment) ){
+                    showMsgErreur($confirmationMsgReleaseComment, 'green');
+                }
+            ?>
+            <form method="POST">
+                <div>
+                    <label for="description">Ajouter un commentaire</label><br/>
+                    <textarea id="description" name="description"
+                              placeholder="Rédigez le texte de votre commentaire ici..."
+                              rows="4"
+                              cols="60" required>
+                        <?= htmlspecialchars($description) ?>
+                    </textarea>
+                    <br/>
+                </div>
+                <button type="submit" name="submit_comment">Publier le commentaire</button>
+            </form>
+            <br/>
+            <div class="comments-list">
+                <?php
+                    if ( empty($comments) ): ?>
+                        <p>Aucun commentaire publié pour le moment.</p>
+                <?php else: ?>
+                    <?php foreach ($comments as $comment):
+                            $commentAuthor = getPseudoById($comment['idUser']);
+                            $commentDate =  date( DATE_FORMAT_DISPLAY, strtotime($comment['date']) );
+                        ?>
+                        <article class="comment">
+                            <strong><?= mb_strtoupper(htmlspecialchars($commentAuthor)) ?></strong>,
+                            le <?= htmlspecialchars($commentDate) ?>
+                            <p><?= nl2br(htmlspecialchars($comment['description'])) ?></p>
+                        </article>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
+        </section>
+        <?php endif; ?>
+    </main>
+
+
+<?php require_once __DIR__ . '/includes/footer.php'; ?>
