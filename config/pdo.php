@@ -27,6 +27,12 @@
         return $stmt->fetchAll();
     }
 
+    function createCategory(string $name): bool {
+        $stmt = getConnexion()->prepare("INSERT INTO categorie (nom) VALUES (?)");
+
+        return $stmt->execute([$name]);
+    }
+
     function getPseudoById(int $idUser) : string {
         $stmt = getConnexion()->prepare("SELECT pseudo FROM user WHERE idUser=?");
         $stmt->execute([$idUser]);
