@@ -21,6 +21,12 @@
         return $stmt->fetch();
     }
 
+    function getAllCategories(): array {
+        $stmt = getConnexion()->query("SELECT idCategorie, nom FROM categorie ORDER BY nom ASC");
+
+        return $stmt->fetchAll();
+    }
+
     function getPseudoById(int $idUser) : string {
         $stmt = getConnexion()->prepare("SELECT pseudo FROM user WHERE idUser=?");
         $stmt->execute([$idUser]);
