@@ -33,6 +33,19 @@
         return $stmt->execute([$name]);
     }
 
+    function getCategoryById(int $id) : array|false {
+        $stmt = getConnexion()->prepare("SELECT idCategorie, nom FROM categorie WHERE idCategorie = ?");
+        $stmt->execute([$id]);
+
+        return $stmt->fetch();
+    }
+
+    function updateCategory(int $id, string $name) : bool  {
+        $stmt = getConnexion()->prepare("UPDATE Categorie SET nom = ? WHERE idCategorie = ?");
+
+        return $stmt->execute([$name, $id]);
+    }
+
     function getPseudoById(int $idUser) : string {
         $stmt = getConnexion()->prepare("SELECT pseudo FROM user WHERE idUser=?");
         $stmt->execute([$idUser]);

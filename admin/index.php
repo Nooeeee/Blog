@@ -16,10 +16,13 @@ require_once __DIR__ . '/../includes/header.php';
     <?php else: ?>
         <ul>
             <?php foreach ($categories as $categorie): ?>
-                <li><?= htmlspecialchars($categorie['nom']) ?></li>
+                <li>
+                    <?= htmlspecialchars($categorie['nom'], ENT_QUOTES, 'UTF-8') ?>
+                    <a href="/TPBlog/admin/edit.php?id=<?= (int) $categorie['idCategorie'] ?>">Modifier</a>
+                </li>
             <?php endforeach; ?>
         </ul>
-    <?php endif ?>
+    <?php endif; ?>
 </main>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
