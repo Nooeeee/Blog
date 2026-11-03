@@ -46,6 +46,12 @@
         return $stmt->execute([$name, $id]);
     }
 
+    function deleteCategory(int $id) : bool {
+        $stmt = getConnexion()->prepare("DELETE FROM categorie WHERE idCategorie = ?");
+
+        return $stmt->execute([$id]);
+    }
+
     function getPseudoById(int $idUser) : string {
         $stmt = getConnexion()->prepare("SELECT pseudo FROM user WHERE idUser=?");
         $stmt->execute([$idUser]);

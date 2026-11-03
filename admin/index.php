@@ -19,6 +19,11 @@ require_once __DIR__ . '/../includes/header.php';
                 <li>
                     <?= htmlspecialchars($categorie['nom'], ENT_QUOTES, 'UTF-8') ?>
                     <a href="/TPBlog/admin/edit.php?id=<?= (int) $categorie['idCategorie'] ?>">Modifier</a>
+
+                    <form method="POST" action="/TPBlog/admin/delete.php">
+                        <input type="hidden" name ="id" value="<?= (int) $categorie['idCategorie'] ?>">
+                        <button type="submit">Supprimer</button>
+                    </form>
                 </li>
             <?php endforeach; ?>
         </ul>
