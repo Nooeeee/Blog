@@ -101,7 +101,7 @@
     }
 
     // Récupère l'Article spécifié
-    function getArticle(int $idArticle): array {
+    function getArticle(int $idArticle): array|false {
         $stmt = getConnexion()->prepare("SELECT * FROM Article WHERE idArticle=?");
         $stmt->execute([$idArticle]);
 
@@ -178,36 +178,46 @@
     }
 
     function insertComment(string $description, string $date, int $idArticle, int $idUser): void {
-        $stmtArticle = getConnexion()->prepare("INSERT INTO Commentaire (e, idArticle, idUser) VALUES (?, ?, ?, ?)");description, dat
-        $stmtArticle->execute([$description, $date, $idArticle, $idUser]);
+        $stmtComment = getConnexion()->prepare("INSERT INTO Commentaire (description, date, idArticle, idUser) VALUES (?, ?, ?, ?)");
+        $stmtComment->execute([$description, $date, $idArticle, $idUser]);
     }
 
-    function deleteArticle(string $idArticle)
-        $strmCheck = $pdo->prepare('SELECT user_id FROM article WHERE idArticle = ? ');
-            $strmCheck->execute([$article_id]);
-            $article_a_supprimer = $strmCheck->Fetch();
+    // Supprime un article (et ses commentaires / catégories grâce au ON DELETE CASCADE)
+    // Seul l'auteur de l'article ou un admin peut le supprimer
+    function deleteArticle(int $idArticle, int $idUser, bool $isAdmin): bool {
+        $stmtCheck = getConnexion()->prepare("SELECT idUser FROM Article WHERE idArticle = ?");
+        $stmtCheck->execute([$idArticle]);
+        $article = $stmtCheck->fetch();
 
-        if($article_a_supprimer && ($article_a_supprimer['user_id'] === $current_user_id || $is_admin)){}
-            $strmDel = $pdo->prepare('DELETE FROM article WHERE idArticle = ? ');
-            $strmDel->execute([$article_id]);
+        if ($article === false) {
+            return false;
+        }
+
+        if ((int) $article['idUser'] !== $idUser && !$isAdmin) {
+            return false;
+        }
+
+        $stmtDel = getConnexion()->prepare("DELETE FROM Article WHERE idArticle = ?");
+
+        return $stmtDel->execute([$idArticle]);
     }
 
-    function deleteCommentaire(string $idCommentaire){
-         $strmCheck = $pdo->prepare('SELECT user_id FROM commentaire WHERE idCommentaire = ? ');
-            $strmCheck->execute([$com_id]);
-            $commentaire_a_supprimer = $strmCheck->Fetch();
+    // Supprime un commentaire
+    // Seul l'auteur du commentaire ou un admin peut le supprimer
+    function deleteCommentaire(int $idCommentaire, int $idUser, bool $isAdmin): bool {
+        $stmtCheck = getConnexion()->prepare("SELECT idUser FROM Commentaire WHERE idCommentaire = ?");
+        $stmtCheck->execute([$idCommentaire]);
+        $commentaire = $stmtCheck->fetch();
 
-        if($commentaire_a_supprimer && ($commentaire_a_supprimer['user_id'] === $current_user_id || $is_admin)){}
-            $strmDel = $pdo->prepare('DELETE FROM commentaire WHERE idCommentaire = ? ');
-            $strmDel->execute([$com_id])
-    }
+        if ($commentaire === false) {
+            return false;
+        }
 
-    function recuperationArticleEtCommentaire(string $idArticle, string $idCommentaire, int $idUser){
-        $stmt = $pdo->prepare('SELECT * FROM article WHERE idArticle = ? ');
-        $stmt->execute([$article_id]);
-        $article = $stmt->fetch();
+        if ((int) $commentaire['idUser'] !== $idUser && !$isAdmin) {
+            return false;
+        }
 
-        $stmtCom = $pdo->prepare('SELECT c.*, u.pseudo FROM commentaire c JOIN user u on c.user_id = u.id WHERE c.article_id = ? ORDER BY c.date DESC');
-        $stmtCom->execute([$article_id]);
-        $commentaire = $stmtCom->fetchAll();
+        $stmtDel = getConnexion()->prepare("DELETE FROM Commentaire WHERE idCommentaire = ?");
+
+        return $stmtDel->execute([$idCommentaire]);
     }
