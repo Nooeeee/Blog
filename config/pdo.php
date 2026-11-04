@@ -178,8 +178,36 @@
     }
 
     function insertComment(string $description, string $date, int $idArticle, int $idUser): void {
-        $stmtArticle = getConnexion()->prepare("INSERT INTO Commentaire (description, date, idArticle, idUser) VALUES (?, ?, ?, ?)");
+        $stmtArticle = getConnexion()->prepare("INSERT INTO Commentaire (e, idArticle, idUser) VALUES (?, ?, ?, ?)");description, dat
         $stmtArticle->execute([$description, $date, $idArticle, $idUser]);
     }
 
+    function deleteArticle(string $idArticle)
+        $strmCheck = $pdo->prepare('SELECT user_id FROM article WHERE idArticle = ? ');
+            $strmCheck->execute([$article_id]);
+            $article_a_supprimer = $strmCheck->Fetch();
 
+        if($article_a_supprimer && ($article_a_supprimer['user_id'] === $current_user_id || $is_admin)){}
+            $strmDel = $pdo->prepare('DELETE FROM article WHERE idArticle = ? ');
+            $strmDel->execute([$article_id]);
+    }
+
+    function deleteCommentaire(string $idCommentaire){
+         $strmCheck = $pdo->prepare('SELECT user_id FROM commentaire WHERE idCommentaire = ? ');
+            $strmCheck->execute([$com_id]);
+            $commentaire_a_supprimer = $strmCheck->Fetch();
+
+        if($commentaire_a_supprimer && ($commentaire_a_supprimer['user_id'] === $current_user_id || $is_admin)){}
+            $strmDel = $pdo->prepare('DELETE FROM commentaire WHERE idCommentaire = ? ');
+            $strmDel->execute([$com_id])
+    }
+
+    function recuperationArticleEtCommentaire(string $idArticle, string $idCommentaire, int $idUser){
+        $stmt = $pdo->prepare('SELECT * FROM article WHERE idArticle = ? ');
+        $stmt->execute([$article_id]);
+        $article = $stmt->fetch();
+
+        $stmtCom = $pdo->prepare('SELECT c.*, u.pseudo FROM commentaire c JOIN user u on c.user_id = u.id WHERE c.article_id = ? ORDER BY c.date DESC');
+        $stmtCom->execute([$article_id]);
+        $commentaire = $stmtCom->fetchAll();
+    }
