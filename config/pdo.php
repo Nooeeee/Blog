@@ -21,6 +21,37 @@
         return $stmt->fetch();
     }
 
+    function getAllCategories(): array {
+        $stmt = getConnexion()->query("SELECT idCategorie, nom FROM categorie ORDER BY nom ASC");
+
+        return $stmt->fetchAll();
+    }
+
+    function createCategory(string $name): bool {
+        $stmt = getConnexion()->prepare("INSERT INTO categorie (nom) VALUES (?)");
+
+        return $stmt->execute([$name]);
+    }
+
+    function getCategoryById(int $id) : array|false {
+        $stmt = getConnexion()->prepare("SELECT idCategorie, nom FROM categorie WHERE idCategorie = ?");
+        $stmt->execute([$id]);
+
+        return $stmt->fetch();
+    }
+
+    function updateCategory(int $id, string $name) : bool  {
+        $stmt = getConnexion()->prepare("UPDATE Categorie SET nom = ? WHERE idCategorie = ?");
+
+        return $stmt->execute([$name, $id]);
+    }
+
+    function deleteCategory(int $id) : bool {
+        $stmt = getConnexion()->prepare("DELETE FROM categorie WHERE idCategorie = ?");
+
+        return $stmt->execute([$id]);
+    }
+
     function getPseudoById(int $idUser) : string {
         $stmt = getConnexion()->prepare("SELECT pseudo FROM user WHERE idUser=?");
         $stmt->execute([$idUser]);
@@ -53,6 +84,14 @@
     function getTotalArticles(): int {
         $stmt = getConnexion()->query("SELECT COUNT(idArticle) AS nbArticles FROM article");
         return (int) $stmt->fetchColumn();
+    }
+
+    // Récupère le nombre de commentaires d'un article
+    function getArticlesFromUser(string $idUser): array {
+        $stmt = getConnexion()->query("SELECT * FROM article WHERE idUser=?");
+        $stmt->execute([$idUser]);
+
+        return $stmt->fetchAll();
     }
 
     // Récupère le nombre de commentaires d'un article
