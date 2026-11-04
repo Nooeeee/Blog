@@ -10,7 +10,8 @@
     $stmt = $connexion->query("SELECT * FROM user WHERE email='admin@localhost.fr'");
 
     if ( $stmt && $stmt->fetch() === false ) {
-        $connexion->query("INSERT INTO user (email, mdp, pseudo, admin) VALUES('admin@localhost.fr', 'admin69IUT;', 'admin', 1)");
+        $pwd = password_hash("admin69IUT;", PASSWORD_DEFAULT);
+        createUser("admin@localhost.fr", $pwd, "admin", 1);
         echo "Administrateur créé avec succès.";
     } else {
         echo "Administrateur déjà existant.";

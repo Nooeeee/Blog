@@ -66,6 +66,7 @@
         return $stmt->fetchColumn();
     }
 
+    // Récupère les 5 articles les plus récents de la page donnée
     function getArticlesByPage(int $page = 1): array {
         $page = max(1, $page);
 
@@ -79,14 +80,39 @@
         return $stmt->fetchAll();
     }
 
+    // Récupère le nombre total d'articles dans la base de données
     function getTotalArticles(): int {
         $stmt = getConnexion()->query("SELECT COUNT(idArticle) AS nbArticles FROM article");
         return (int) $stmt->fetchColumn();
     }
 
+    function getArticlesFromUser(string $idUser): array {
+        $stmt = getConnexion()->query("SELECT * FROM article WHERE idUser=?");
+        $stmt->execute([$idUser]);
+
+        return $stmt->fetchAll();
+    }
+
+    // Récupère le nombre de commentaires d'un article
     function getTotalComments(int $idArticle): int {
         $stmt = getConnexion()->query("SELECT COUNT(idCommentaire) FROM commentaire WHERE idArticle=$idArticle");
         return (int) $stmt->fetchColumn();
+    }
+
+    // Récupère l'Article spécifié
+    function getArticle(int $idArticle): array {
+        $stmt = getConnexion()->prepare("SELECT * FROM Article WHERE idArticle=?");
+        $stmt->execute([$idArticle]);
+
+        return $stmt->fetch();
+    }
+
+    // Récupère tous les commentaires de l'Article spécifié
+    function getCommentsFromArticle(int $idArticle): array{
+        $stmt = getConnexion()->prepare("SELECT * FROM Commentaire WHERE idArticle=?");
+        $stmt->execute([$idArticle]);
+
+        return $stmt->fetchAll();
     }
 
     function createUser(string $email, string $pwd, string $pseudo, bool $admin = false): int {
@@ -107,10 +133,8 @@
 
             $connexion->commit();
 
-            header("Location: /TPBlog/index.php");
             return true;
-        } catch( PDOException $exception ) {
-            echo "Erreur SQL : " . $exception->getMessage() . "<br/>";
+        } catch( PDOException ) {
             if( $connexion->inTransaction() ){
                 $connexion->rollBack();
             }
@@ -118,6 +142,7 @@
         }
     }
 
+    // renvoie l'ID de l'Article
     function insertArticle(string $title, string $description, string $date, int $idUser): int {
         $stmtArticle = getConnexion()->prepare("INSERT INTO Article (titre, description, date, idUser) VALUES (?, ?, ?, ?)");
         $stmtArticle->execute([$title, $description, $date, $idUser]);
@@ -132,4 +157,28 @@
             $stmtFk->execute([$idArticle, (int) $idCategorie]);
         }
     }
-?>
+
+    function createComment(string $description, string $date, int $idArticle, int $idUser): bool {
+        $connexion = getConnexion();
+        try {
+            $connexion->beginTransaction();
+
+            // insertion du commentaire dans sa table
+            insertComment($description, $date, $idArticle, $idUser);
+            $connexion->commit();
+
+            return true;
+        } catch( PDOException) {
+            if( $connexion->inTransaction() ){
+                $connexion->rollBack();
+            }
+            return false;
+        }
+    }
+
+    function insertComment(string $description, string $date, int $idArticle, int $idUser): void {
+        $stmtArticle = getConnexion()->prepare("INSERT INTO Commentaire (description, date, idArticle, idUser) VALUES (?, ?, ?, ?)");
+        $stmtArticle->execute([$description, $date, $idArticle, $idUser]);
+    }
+
+
