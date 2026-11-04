@@ -10,8 +10,18 @@
         $currentPage = 1;
     }
 
-    $articles = getArticlesByPage($currentPage);
-    $nbTotalPages = (int) ceil(getTotalArticles() / 5);
+    $authors = getAuthors();
+    $selectedUser = $_GET['user'] ?? '';
+
+    if ( empty($selectedUser) ) {
+        $articles = getArticlesByPage(null, $currentPage);
+        $nbTotalPages = (int) ceil(getTotalArticles(null) / 5);
+    } else {
+        $selectedUserId = getIdByPseudo($selectedUser) ?? null;
+
+        $articles = getArticlesByPage($selectedUserId, $currentPage);
+        $nbTotalPages = (int) ceil(getTotalArticles($selectedUserId) / 5);
+    }
 
     $errorMsgNoAvailable = 'Contenu indisponible';
 ?>
@@ -25,9 +35,24 @@
             if ( empty($articles) ): ?>
                 <p>Aucun article n'a été publié pour le moment.</p>
         <?php else: ?>
+        <label for="user">Choisissez l'utilisateur dont vous souhaitez voir les articles :</label>
+        <form method="GET">
+            <select name="user" id="user">
+                <option value=''>----Tous----</option>
+                <?php
+                if ( !empty($authors) ):
+                    foreach ( $authors as $author ): ?>
+                        <option value="<?= htmlspecialchars($author['pseudo']) ?>"
+                            <?= $selectedUser === $author['pseudo'] ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($author['pseudo']) ?>
+                        </option>
+                    <?php   endforeach;
+                endif; ?>
+            </select>
+            <button type="submit">Filtrer</button>
+        </form>
                 <section class="list-articles">
-        <?php
-                foreach ( $articles as $article ):
+        <?php       foreach ( $articles as $article ):
                     $userPseudo = getPseudoById($article['idUser']);
                     $dateArticle = date( DATE_FORMAT_DISPLAY, strtotime($article['date']) );
                     $totalComments = getTotalComments($article['idArticle']);
@@ -62,9 +87,12 @@
                 </section>
         <br/>
 
+        <?php
+        $urlFilter = !empty($selectedUser) ? '&user=' . urlencode($selectedUser) : '';
+        ?>
         <nav class="pages">
             <?php if ( $currentPage > 1 ): ?>
-                <a href="/TPBlog/index.php?page=<?= $currentPage - 1 ?>">Page Précédente</a>
+                <a href="/TPBlog/index.php?page=<?= $currentPage - 1 . $urlFilter?>">Page Précédente</a>
             <?php endif; ?>
 
             <?php
@@ -72,14 +100,14 @@
             $endingPage = min($nbTotalPages, $currentPage + 2);
             for ($i = $startingPage; $i <= $endingPage; $i++):
                 if ( $i === $currentPage ):?>
-                <a href="/TPBlog/index.php?page=<?= $i ?>"><strong><?= $i ?></strong></a>
+                <a href="/TPBlog/index.php?page=<?= $i . $urlFilter?>"><strong><?= $i ?></strong></a>
                 <?php else: ?>
-                    <a href="/TPBlog/index.php?page=<?= $i ?>"><?= $i ?></a>
+                    <a href="/TPBlog/index.php?page=<?= $i . $urlFilter?>"><?= $i ?></a>
             <?php endif;
             endfor; ?>
 
             <?php if ( $currentPage < $nbTotalPages ): ?>
-                <a href="/TPBlog/index.php?page=<?= $currentPage + 1 ?>">Page Suivant</a>
+                <a href="/TPBlog/index.php?page=<?= $currentPage + 1 . $urlFilter ?>">Page Suivant</a>
             <?php endif; ?>
         </nav>
     </main>
