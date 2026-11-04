@@ -67,22 +67,37 @@
     }
 
     // Récupère les 5 articles les plus récents de la page donnée
-    function getArticlesByPage(int $page = 1): array {
+    function getArticlesByPage(?int $selectedUser, int $page = 1): array {
         $page = max(1, $page);
 
         // (page - 1) => 1ère page = pas de décalage ; 2ème page => (2-1)*5 = 5 articles de décalage
         $offset = ($page - 1) * 5;
 
-        $stmt = getConnexion()->prepare("SELECT * FROM article ORDER BY idArticle DESC LIMIT 5 OFFSET :offset");
+        if ( empty($selectedUser) ) {
+            $stmt = getConnexion()->prepare("SELECT * FROM article ORDER BY idArticle DESC LIMIT 5 OFFSET :offset");
+        } else {
+            // puisque idArticle est autoincrémenté => pas besoin calculer via date (ORDER BY idArticle)
+            $stmt = getConnexion()->prepare("SELECT * FROM article WHERE idUser=:idUser 
+                      ORDER BY idArticle DESC LIMIT 5 OFFSET :offset");
+
+            $stmt->bindValue(':idUser', $selectedUser, PDO::PARAM_INT);
+        }
+
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
 
         return $stmt->fetchAll();
     }
 
-    // Récupère le nombre total d'articles dans la base de données
-    function getTotalArticles(): int {
-        $stmt = getConnexion()->query("SELECT COUNT(idArticle) AS nbArticles FROM article");
+    // Récupère le nombre total d'articles (d'un utilisateur ou non) dans la base de données
+    function getTotalArticles(?int $idUser): int {
+        if ( empty($idUser) ) {
+            $stmt = getConnexion()->query("SELECT COUNT(idArticle) AS nbArticles FROM article");
+        } else {
+            $stmt = getConnexion()->prepare("SELECT COUNT(idArticle) AS nbArticles FROM article WHERE idUser=?");
+            $stmt->execute([$idUser]);
+        }
+
         return (int) $stmt->fetchColumn();
     }
 
@@ -90,6 +105,15 @@
     function getArticlesFromUser(string $idUser): array {
         $stmt = getConnexion()->query("SELECT * FROM article WHERE idUser=?");
         $stmt->execute([$idUser]);
+
+        return $stmt->fetchAll();
+    }
+
+    // Récupère tous les auteurs
+    function getAuthors(): array {
+        $stmt = getConnexion()->query(
+            "SELECT DISTINCT u.idUser, u.pseudo FROM user AS u 
+                    JOIN article a ON u.idUser = a.idUser");
 
         return $stmt->fetchAll();
     }
