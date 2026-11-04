@@ -9,36 +9,11 @@
     $errorMsgReleaseComment = null;
     $errorMsgDataNotFound = null;
     $errorMsgEmptyComment = null;
-    $errorMsgDelete = null;
 
     $confirmationMsgReleaseComment = null;
-    $confirmationMsgDelete = null;
 
     $currentUserId = (int) ($_SESSION['idUser'] ?? 0);
     $currentUserIsAdmin = isAdmin();
-
-    // Suppression d'un article
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_article'])) {
-        $idArticleToDelete = (int) $_POST['delete_article'];
-
-        if ( deleteArticle($idArticleToDelete, $currentUserId, $currentUserIsAdmin) ) {
-            header("Location: /TPBlog/index.php");
-            exit;
-        } else {
-            $errorMsgDelete = "Vous n'avez pas les droits pour supprimer cet article.";
-        }
-    }
-
-    // Suppression d'un commentaire
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_comment'])) {
-        $idCommentToDelete = (int) $_POST['delete_comment'];
-
-        if ( deleteCommentaire($idCommentToDelete, $currentUserId, $currentUserIsAdmin) ) {
-            $confirmationMsgDelete = "Le commentaire a bien été supprimé.";
-        } else {
-            $errorMsgDelete = "Vous n'avez pas les droits pour supprimer ce commentaire.";
-        }
-    }
 
     // Création de commentaire
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_comment'])) {
@@ -73,7 +48,6 @@
     <main>
         <?php if ( empty($article) ):
             showMsgErreur($errorMsgDataNotFound);
-            showMsgErreur($errorMsgDelete);
         else:
             $userPseudo = getPseudoById($article['idUser']);
             $dateArticle = date( DATE_FORMAT_DISPLAY, strtotime($article['date']) );
@@ -87,7 +61,9 @@
             </div>
 
             <?php if ( $currentUserIsAdmin || (int) $article['idUser'] === $currentUserId ): ?>
-                <form method="POST" onsubmit="return confirm('Voulez-vous vraiment supprimer cet article ?');">
+                <form method="POST" action="/TPBlog/suppression_article_commentaire.php"
+                      onsubmit="return confirm('Voulez-vous vraiment supprimer cet article ?');">
+                    <input type="hidden" name="idArticle" value="<?= (int) $article['idArticle'] ?>">
                     <button type="submit" name="delete_article" value="<?= (int) $article['idArticle'] ?>">Supprimer l'article</button>
                 </form>
             <?php endif; ?>
@@ -100,12 +76,8 @@
                 showMsgErreur($errorMsgReleaseComment);
                 showMsgErreur($errorMsgDataNotFound);
                 showMsgErreur($errorMsgEmptyComment);
-                showMsgErreur($errorMsgDelete);
                 if ( !empty($confirmationMsgReleaseComment) ){
                     showMsgErreur($confirmationMsgReleaseComment, 'green');
-                }
-                if ( !empty($confirmationMsgDelete) ){
-                    showMsgErreur($confirmationMsgDelete, 'green');
                 }
             ?>
             <form method="POST">
@@ -137,7 +109,9 @@
                             <p><?= nl2br(htmlspecialchars($comment['description'])) ?></p>
 
                             <?php if ( $currentUserIsAdmin || (int) $comment['idUser'] === $currentUserId ): ?>
-                                <form method="POST" onsubmit="return confirm('Voulez-vous vraiment supprimer ce commentaire ?');">
+                                <form method="POST" action="/TPBlog/suppression_article_commentaire.php"
+                                      onsubmit="return confirm('Voulez-vous vraiment supprimer ce commentaire ?');">
+                                    <input type="hidden" name="idArticle" value="<?= (int) $article['idArticle'] ?>">
                                     <button type="submit" name="delete_comment" value="<?= (int) $comment['idCommentaire'] ?>">Supprimer le commentaire</button>
                                 </form>
                             <?php endif; ?>
