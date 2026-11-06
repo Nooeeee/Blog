@@ -32,13 +32,16 @@
 
         if( !$ErrorMsgTitre && !$ErrorMsgDesc && !$ErrorMsgCategories ) {
             $idUser = $_SESSION['idUser'] ?? getIdByPseudo($_SESSION['pseudo']);
-            if ( $idUser === 0 || $idUser === false ) {
+            if ( empty($idUser) ) {
                 $ErrorMsgCreateArticle = "Erreur lors de la récupération des données utilisateur";
-                exit;
-            }
-            $date = date('Y-m-d H:i:s');
-            if( createArticle($title, $description, $date, $idUser, $selectedCategories) === false ) {
-                $ErrorMsgCreateArticle = "Erreur lors de l'enregistrement de l'article.";
+            } else {
+                $date = date('Y-m-d H:i:s');
+                if( !createArticle($title, $description, $date, $idUser, $selectedCategories) ) {
+                    $ErrorMsgCreateArticle = "Erreur lors de l'enregistrement de l'article.";
+                } else {
+                    header("Location: /TPBlog/index.php");
+                    exit;
+                }
             }
         }
     }

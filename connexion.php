@@ -18,7 +18,7 @@
             $email = $_POST['email'];
             if ( filter_var($email, FILTER_VALIDATE_EMAIL) ) {
                 $isValidMail = true;
-                $_SESSION['email'] = htmlspecialchars($email);
+                $_SESSION['email'] = htmlspecialchars(mb_strtolower($email));
             } else {
                 $ErrorMsgMail = "L'adresse email n'est pas valide.";
             }

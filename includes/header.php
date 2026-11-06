@@ -19,10 +19,17 @@
                 <a href="/TPBlog/create_article.php">Créer un article</a>
                 <br/><br/>
 
+                <?php if ( isAdmin() ): ?>
+                    <a href="/TPBlog/admin/index.php">Gérer catégorie(s)</a>
+                    <br/><br/>
+
+                <?php endif; ?>
+
                 <form method="POST">
                     <button type="submit" name="logout">Déconnexion</button>
                 </form>
             <?php endif; ?>
+
 
 
         </header>

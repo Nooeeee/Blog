@@ -21,6 +21,37 @@
         return $stmt->fetch();
     }
 
+    function getAllCategories(): array {
+        $stmt = getConnexion()->query("SELECT idCategorie, nom FROM categorie ORDER BY nom ASC");
+
+        return $stmt->fetchAll();
+    }
+
+    function createCategory(string $name): bool {
+        $stmt = getConnexion()->prepare("INSERT INTO categorie (nom) VALUES (?)");
+
+        return $stmt->execute([$name]);
+    }
+
+    function getCategoryById(int $id) : array|false {
+        $stmt = getConnexion()->prepare("SELECT idCategorie, nom FROM categorie WHERE idCategorie = ?");
+        $stmt->execute([$id]);
+
+        return $stmt->fetch();
+    }
+
+    function updateCategory(int $id, string $name) : bool  {
+        $stmt = getConnexion()->prepare("UPDATE Categorie SET nom = ? WHERE idCategorie = ?");
+
+        return $stmt->execute([$name, $id]);
+    }
+
+    function deleteCategory(int $id) : bool {
+        $stmt = getConnexion()->prepare("DELETE FROM categorie WHERE idCategorie = ?");
+
+        return $stmt->execute([$id]);
+    }
+
     function getPseudoById(int $idUser) : string {
         $stmt = getConnexion()->prepare("SELECT pseudo FROM user WHERE idUser=?");
         $stmt->execute([$idUser]);
@@ -35,27 +66,78 @@
         return $stmt->fetchColumn();
     }
 
-    function getArticlesByPage(int $page = 1): array {
+    // Récupère les 5 articles les plus récents de la page donnée
+    function getArticlesByPage(?int $selectedUser, int $page = 1): array {
         $page = max(1, $page);
 
         // (page - 1) => 1ère page = pas de décalage ; 2ème page => (2-1)*5 = 5 articles de décalage
         $offset = ($page - 1) * 5;
 
-        $stmt = getConnexion()->prepare("SELECT * FROM article ORDER BY idArticle DESC LIMIT 5 OFFSET :offset");
+        if ( empty($selectedUser) ) {
+            $stmt = getConnexion()->prepare("SELECT * FROM article ORDER BY idArticle DESC LIMIT 5 OFFSET :offset");
+        } else {
+            // puisque idArticle est autoincrémenté => pas besoin calculer via date (ORDER BY idArticle)
+            $stmt = getConnexion()->prepare("SELECT * FROM article WHERE idUser=:idUser 
+                      ORDER BY idArticle DESC LIMIT 5 OFFSET :offset");
+
+            $stmt->bindValue(':idUser', $selectedUser, PDO::PARAM_INT);
+        }
+
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
 
         return $stmt->fetchAll();
     }
 
-    function getTotalArticles(): int {
-        $stmt = getConnexion()->query("SELECT COUNT(idArticle) AS nbArticles FROM article");
+    // Récupère le nombre total d'articles (d'un utilisateur ou non) dans la base de données
+    function getTotalArticles(?int $idUser): int {
+        if ( empty($idUser) ) {
+            $stmt = getConnexion()->query("SELECT COUNT(idArticle) AS nbArticles FROM article");
+        } else {
+            $stmt = getConnexion()->prepare("SELECT COUNT(idArticle) AS nbArticles FROM article WHERE idUser=?");
+            $stmt->execute([$idUser]);
+        }
+
         return (int) $stmt->fetchColumn();
     }
 
+    // Récupère le nombre de commentaires d'un article
+    function getArticlesFromUser(string $idUser): array {
+        $stmt = getConnexion()->query("SELECT * FROM article WHERE idUser=?");
+        $stmt->execute([$idUser]);
+
+        return $stmt->fetchAll();
+    }
+
+    // Récupère tous les auteurs
+    function getAuthors(): array {
+        $stmt = getConnexion()->query(
+            "SELECT DISTINCT u.idUser, u.pseudo FROM user AS u 
+                    JOIN article a ON u.idUser = a.idUser");
+
+        return $stmt->fetchAll();
+    }
+
+    // Récupère le nombre de commentaires d'un article
     function getTotalComments(int $idArticle): int {
         $stmt = getConnexion()->query("SELECT COUNT(idCommentaire) FROM commentaire WHERE idArticle=$idArticle");
         return (int) $stmt->fetchColumn();
+    }
+
+    // Récupère l'Article spécifié
+    function getArticle(int $idArticle): array|false {
+        $stmt = getConnexion()->prepare("SELECT * FROM Article WHERE idArticle=?");
+        $stmt->execute([$idArticle]);
+
+        return $stmt->fetch();
+    }
+
+    // Récupère tous les commentaires de l'Article spécifié
+    function getCommentsFromArticle(int $idArticle): array{
+        $stmt = getConnexion()->prepare("SELECT * FROM Commentaire WHERE idArticle=?");
+        $stmt->execute([$idArticle]);
+
+        return $stmt->fetchAll();
     }
 
     function createUser(string $email, string $pwd, string $pseudo, bool $admin = false): int {
@@ -76,10 +158,8 @@
 
             $connexion->commit();
 
-            header("Location: /TPBlog/index.php");
             return true;
-        } catch( PDOException $exception ) {
-            echo "Erreur SQL : " . $exception->getMessage() . "<br/>";
+        } catch( PDOException ) {
             if( $connexion->inTransaction() ){
                 $connexion->rollBack();
             }
@@ -87,6 +167,7 @@
         }
     }
 
+    // renvoie l'ID de l'Article
     function insertArticle(string $title, string $description, string $date, int $idUser): int {
         $stmtArticle = getConnexion()->prepare("INSERT INTO Article (titre, description, date, idUser) VALUES (?, ?, ?, ?)");
         $stmtArticle->execute([$title, $description, $date, $idUser]);
@@ -101,4 +182,66 @@
             $stmtFk->execute([$idArticle, (int) $idCategorie]);
         }
     }
-?>
+
+    function createComment(string $description, string $date, int $idArticle, int $idUser): bool {
+        $connexion = getConnexion();
+        try {
+            $connexion->beginTransaction();
+
+            // insertion du commentaire dans sa table
+            insertComment($description, $date, $idArticle, $idUser);
+            $connexion->commit();
+
+            return true;
+        } catch( PDOException) {
+            if( $connexion->inTransaction() ){
+                $connexion->rollBack();
+            }
+            return false;
+        }
+    }
+
+    function insertComment(string $description, string $date, int $idArticle, int $idUser): void {
+        $stmtComment = getConnexion()->prepare("INSERT INTO Commentaire (description, date, idArticle, idUser) VALUES (?, ?, ?, ?)");
+        $stmtComment->execute([$description, $date, $idArticle, $idUser]);
+    }
+
+    // Supprime un article (et ses commentaires / catégories grâce au ON DELETE CASCADE)
+    // Seul l'auteur de l'article ou un admin peut le supprimer
+    function deleteArticle(int $idArticle, int $idUser, bool $isAdmin): bool {
+        $stmtCheck = getConnexion()->prepare("SELECT idUser FROM Article WHERE idArticle = ?");
+        $stmtCheck->execute([$idArticle]);
+        $article = $stmtCheck->fetch();
+
+        if ($article === false) {
+            return false;
+        }
+
+        if ((int) $article['idUser'] !== $idUser && !$isAdmin) {
+            return false;
+        }
+
+        $stmtDel = getConnexion()->prepare("DELETE FROM Article WHERE idArticle = ?");
+
+        return $stmtDel->execute([$idArticle]);
+    }
+
+    // Supprime un commentaire
+    // Seul l'auteur du commentaire ou un admin peut le supprimer
+    function deleteCommentaire(int $idCommentaire, int $idUser, bool $isAdmin): bool {
+        $stmtCheck = getConnexion()->prepare("SELECT idUser FROM Commentaire WHERE idCommentaire = ?");
+        $stmtCheck->execute([$idCommentaire]);
+        $commentaire = $stmtCheck->fetch();
+
+        if ($commentaire === false) {
+            return false;
+        }
+
+        if ((int) $commentaire['idUser'] !== $idUser && !$isAdmin) {
+            return false;
+        }
+
+        $stmtDel = getConnexion()->prepare("DELETE FROM Commentaire WHERE idCommentaire = ?");
+
+        return $stmtDel->execute([$idCommentaire]);
+    }

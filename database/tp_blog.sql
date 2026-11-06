@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le : dim. 01 nov. 2026 à 11:01
+-- Généré le : mer. 04 nov. 2026 à 14:46
 -- Version du serveur : 8.4.7
 -- Version de PHP : 8.3.28
 
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS `article` (
   `idUser` int NOT NULL COMMENT 'Identifiant de l''utilisateur ayant créé et publié le l''article.',
   PRIMARY KEY (`idArticle`),
   KEY `user_article` (`idUser`)
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `article`
@@ -55,7 +55,9 @@ INSERT INTO `article` (`idArticle`, `titre`, `description`, `date`, `idUser`) VA
 (16, 'Les collections en Java', 'Java fournit un ensemble de classes appelées Collections permettant de stocker et manipuler des groupes d\'objets. Les structures les plus courantes sont les listes (ArrayList), les ensembles (HashSet) et les dictionnaires (HashMap). Chaque structure possède des caractéristiques particulières adaptées à différents besoins. Les collections facilitent le développement d\'applications en offrant des fonctionnalités puissantes pour organiser les données.', '2026-10-31 15:25:34', 2),
 (17, 'Les attaques par phishing', 'Le phishing est une technique utilisée par les cybercriminels pour obtenir des informations sensibles telles que des mots de passe ou des coordonnées bancaires. Les victimes reçoivent généralement un courrier électronique ou un message qui semble provenir d\'un organisme de confiance. En cliquant sur un lien frauduleux, elles peuvent être redirigées vers un faux site imitant le site officiel. La vigilance et la vérification des adresses web permettent de limiter ce type de menace.', '2026-10-31 15:25:47', 2),
 (18, 'Le machine learning', 'Le machine learning, ou apprentissage automatique, est une branche de l\'intelligence artificielle permettant aux ordinateurs d\'apprendre à partir de données. Au lieu d\'être programmés pour chaque situation, les modèles sont entraînés à reconnaître des tendances et à prendre des décisions. Cette technologie est utilisée dans de nombreux domaines, notamment la recommandation de contenus, la détection de fraudes, la reconnaissance d\'images et l\'analyse de données.', '2026-10-31 15:26:01', 2),
-(19, 'Le protocole HTTPS', 'HTTPS est une version sécurisée du protocole HTTP utilisée pour les échanges de données sur le Web. Grâce au chiffrement TLS, les informations circulant entre le navigateur et le serveur sont protégées contre l\'interception ou la modification par des tiers. Aujourd\'hui, la plupart des sites utilisent HTTPS afin de garantir la confidentialité des données des utilisateurs, d\'améliorer la confiance des visiteurs et de renforcer la sécurité globale des applications web.', '2026-10-31 15:26:19', 2);
+(19, 'Le protocole HTTPS', 'HTTPS est une version sécurisée du protocole HTTP utilisée pour les échanges de données sur le Web. Grâce au chiffrement TLS, les informations circulant entre le navigateur et le serveur sont protégées contre l\'interception ou la modification par des tiers. Aujourd\'hui, la plupart des sites utilisent HTTPS afin de garantir la confidentialité des données des utilisateurs, d\'améliorer la confiance des visiteurs et de renforcer la sécurité globale des applications web.', '2026-10-31 15:26:19', 2),
+(20, 'L’essor de l’intelligence artificielle dans le développement informatique', 'L\'intelligence artificielle (IA) occupe aujourd\'hui une place de plus en plus importante dans le domaine du développement informatique. Grâce aux progrès réalisés dans l\'apprentissage automatique et les réseaux de neurones, les systèmes d\'IA sont capables d\'analyser de grandes quantités de données, de reconnaître des modèles complexes et d\'assister les développeurs dans de nombreuses tâches quotidiennes.\r\n\r\nDans le développement Web, les outils basés sur l\'intelligence artificielle peuvent générer du code, détecter des erreurs de programmation ou encore suggérer des améliorations pour optimiser les performances d\'une application. Ils permettent également d\'automatiser certaines tâches répétitives, ce qui aide les équipes à gagner du temps et à se concentrer sur des problématiques plus complexes.\r\n\r\nL\'IA est aussi utilisée dans des domaines variés tels que la cybersécurité, où elle contribue à détecter des comportements suspects sur un réseau, ou encore dans les bases de données pour analyser des informations et produire des prédictions. Les assistants conversationnels, les systèmes de recommandation et les outils de traduction automatique reposent également sur cette technologie.\r\n\r\nMalgré ses nombreux avantages, l\'intelligence artificielle ne remplace pas les développeurs. Elle constitue plutôt un outil d\'aide à la décision et à la productivité. Les professionnels doivent toujours vérifier les résultats produits afin de garantir leur qualité, leur sécurité et leur conformité aux besoins des utilisateurs.', '2026-11-01 12:40:23', 2),
+(21, 'Les bases de données NoSQL et leurs usages', 'Les bases de données NoSQL sont apparues pour répondre aux besoins des applications modernes qui manipulent de très grandes quantités de données. Contrairement aux bases de données relationnelles classiques comme MySQL ou PostgreSQL, elles ne reposent pas forcément sur des tables, des lignes et des colonnes. Elles peuvent stocker les informations sous différentes formes : documents, graphes, colonnes ou paires clé-valeur.\r\n\r\nL\'un des principaux avantages du NoSQL est sa capacité à gérer efficacement des volumes de données importants tout en offrant une grande flexibilité. Lorsqu\'une application évolue rapidement et que sa structure de données change fréquemment, les solutions NoSQL permettent souvent de s\'adapter plus facilement qu\'une base de données relationnelle. Des systèmes comme MongoDB, Cassandra ou Redis sont largement utilisés dans les services web modernes, les réseaux sociaux et les plateformes de commerce en ligne.\r\n\r\nLes bases NoSQL sont également conçues pour être distribuées sur plusieurs serveurs, ce qui améliore leur disponibilité et leurs performances. Elles sont particulièrement adaptées aux applications nécessitant un traitement rapide des données ou une montée en charge importante. Cependant, elles ne remplacent pas systématiquement les bases relationnelles. Le choix entre SQL et NoSQL dépend des besoins du projet, de la structure des données et des contraintes de performance. Aujourd\'hui, de nombreuses entreprises utilisent même les deux approches de manière complémentaire afin de tirer parti des avantages de chacune.', '2026-11-04 14:41:57', 8);
 
 -- --------------------------------------------------------
 
@@ -80,18 +82,21 @@ INSERT INTO `article_categorie` (`idArticle`, `idCategorie`) VALUES
 (9, 1),
 (14, 1),
 (19, 1),
+(20, 1),
 (8, 2),
 (10, 2),
 (16, 2),
 (7, 3),
 (10, 3),
 (15, 3),
+(21, 3),
 (8, 4),
 (11, 4),
 (17, 4),
 (19, 4),
 (12, 5),
 (18, 5),
+(20, 5),
 (7, 6),
 (13, 6),
 (14, 6);
@@ -107,7 +112,7 @@ CREATE TABLE IF NOT EXISTS `categorie` (
   `idCategorie` int NOT NULL AUTO_INCREMENT,
   `nom` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Nom de la catégorie',
   PRIMARY KEY (`idCategorie`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `categorie`
@@ -131,13 +136,23 @@ DROP TABLE IF EXISTS `commentaire`;
 CREATE TABLE IF NOT EXISTS `commentaire` (
   `idCommentaire` int NOT NULL AUTO_INCREMENT,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Contenu du commentaire',
-  `date` date NOT NULL COMMENT 'Date de publication du commentaire',
+  `date` datetime NOT NULL COMMENT 'Date de publication du commentaire',
   `idArticle` int NOT NULL COMMENT 'Identifiant de l''article commenté',
   `idUser` int NOT NULL COMMENT 'Identifiant de l''utilisateur ayant publié le commentaire',
   PRIMARY KEY (`idCommentaire`),
   KEY `article_id` (`idArticle`),
   KEY `user_com` (`idUser`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Déchargement des données de la table `commentaire`
+--
+
+INSERT INTO `commentaire` (`idCommentaire`, `description`, `date`, `idArticle`, `idUser`) VALUES
+(1, 'Voici un bien mauvais article...', '2026-11-04 15:37:58', 21, 2),
+(2, 'Excellent, ça me rappel mon cours de Réseaux du semestre 2 !!', '2026-11-04 15:43:36', 19, 2),
+(3, 'Très bon article, je me coucherais moins bête !', '2026-11-04 15:43:54', 18, 2),
+(4, 'Très bon article, si vous n\'avez pas connaissance des dangers de l\'IA, je vous conseil cette excellente vidéo de Ego sur youtube : https://youtu.be/ZP7T6WAK3Ow?si=UT_RI6ue_2tnI5_A', '2026-11-04 15:45:36', 20, 8);
 
 -- --------------------------------------------------------
 
@@ -153,16 +168,16 @@ CREATE TABLE IF NOT EXISTS `user` (
   `pseudo` varchar(25) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Début de l''email de l''utilisateur',
   `admin` tinyint(1) NOT NULL COMMENT 'Booléen pour connaître les permissions à accorder à l''utilisateur (1 = administrateur)',
   PRIMARY KEY (`idUser`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `user`
 --
 
 INSERT INTO `user` (`idUser`, `email`, `mdp`, `pseudo`, `admin`) VALUES
-(1, 'admin@localhost.fr', 'admin69IUT;', 'admin', 1),
 (2, 'noe@gmail.com', '$2y$10$r5UucRaOtg.pmxepfdIwIuifyCXjmviCSoR0NkmC11IyJUuavsRj6', 'noe', 0),
-(8, 'Fred69@gmail.com', '$2y$10$LNcGD0swYpUTNNxyP1cTQeqOVj57GMoBoQ5ZasD5v56u0MjSfNCjW', 'Fred69', 0);
+(8, 'Fred69@gmail.com', '$2y$10$LNcGD0swYpUTNNxyP1cTQeqOVj57GMoBoQ5ZasD5v56u0MjSfNCjW', 'Fred69', 0),
+(9, 'admin@localhost.fr', '$2y$10$pLmfhNQ2.C6CnbhwO.aRoOagCzKzl9PQ7kskU9MxucjX2vn0g4Bki', 'admin', 1);
 
 --
 -- Contraintes pour les tables déchargées
