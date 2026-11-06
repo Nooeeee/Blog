@@ -1,7 +1,7 @@
         <footer>
             <br/>
-            Site réalisé par Noé, Mathieu et Matthis.
+            Site réalisé par Noé, Mathieu et Mattis.
         </footer>
 
     </body>
-</htlm>
+</html>

@@ -11,6 +11,8 @@ require_once __DIR__ . '/../includes/header.php';
 <main>
     <h1>Gestion des catégories</h1>
 
+    <p><a class="bouton" href="/TPBlog/admin/create.php">Ajouter une catégorie</a></p>
+
     <?php if (empty($categories)): ?>
         <p>Aucune catégorie pour le moment.</p>
     <?php else: ?>
