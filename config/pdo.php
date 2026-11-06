@@ -101,14 +101,6 @@
         return (int) $stmt->fetchColumn();
     }
 
-    // Récupère le nombre de commentaires d'un article
-    function getArticlesFromUser(string $idUser): array {
-        $stmt = getConnexion()->query("SELECT * FROM article WHERE idUser=?");
-        $stmt->execute([$idUser]);
-
-        return $stmt->fetchAll();
-    }
-
     // Récupère tous les auteurs
     function getAuthors(): array {
         $stmt = getConnexion()->query(
@@ -206,7 +198,7 @@
         $stmtComment->execute([$description, $date, $idArticle, $idUser]);
     }
 
-    // Supprime un article (et ses commentaires / catégories grâce au ON DELETE CASCADE)
+    // Supprime un article (et ses commentaires / catégories)
     // Seul l'auteur de l'article ou un admin peut le supprimer
     function deleteArticle(int $idArticle, int $idUser, bool $isAdmin): bool {
         $stmtCheck = getConnexion()->prepare("SELECT idUser FROM Article WHERE idArticle = ?");
